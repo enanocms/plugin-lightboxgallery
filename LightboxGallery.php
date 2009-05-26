@@ -11,11 +11,12 @@
 **!*/
 
 // Hook into wikitext render flow
-$plugins->attachHook('render_wikiformat_pre', 'lbgallery_process_tags($text);');
+$plugins->attachHook('render_wikiformat_posttemplates', 'lbgallery_process_tags($text);');
 $plugins->attachHook('html_attribute_whitelist', '$whitelist["lightboxgallery"] = array("maxwidth"); $whitelist["trigger"] = array(); $whitelist["randomimage"] = array("/");');
 
 function lbgallery_process_tags(&$text)
 {
+  // if there are no galleries in this blob, just get out here. also pulls all the matches we need.
   if ( !preg_match_all('#<lightboxgallery(?: maxwidth="?([0-9]+)"?)>(.+?)</lightboxgallery>#s', $text, $matches) )
     return true;
   
@@ -23,6 +24,7 @@ function lbgallery_process_tags(&$text)
   
   foreach ( $matches[0] as $i => $match )
   {
+    // actual parser loop is pretty simple.
     $gallery = lbgallery_build_gallery($matches[2][$i], $matches[1][$i]);
     $text = str_replace($match, $gallery, $text);
   }
@@ -58,6 +60,8 @@ function lbgallery_add_headers()
       }
     </script>');
 }
+
+// The actual function to build the HTML behind a gallery.
 
 function lbgallery_build_gallery($gallerytag, $width)
 {
