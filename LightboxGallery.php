@@ -12,7 +12,7 @@
 
 // Hook into wikitext render flow
 $plugins->attachHook('render_wikiformat_pre', 'lbgallery_process_tags($text);');
-$plugins->attachHook('html_attribute_whitelist', '$whitelist["lightboxgallery"] = array("maxwidth"); $whitelist["trigger"] = array();');
+$plugins->attachHook('html_attribute_whitelist', '$whitelist["lightboxgallery"] = array("maxwidth"); $whitelist["trigger"] = array(); $whitelist["randomimage"] = array("/");');
 
 function lbgallery_process_tags(&$text)
 {
@@ -112,13 +112,18 @@ function lbgallery_build_gallery($gallerytag, $width)
   
   if ( $text )
   {
-    $trigger = str_replace('<a>', $firstimagetag, trim($text));
+    $trigger = trim($text);
   }
   else
   {
-    list($image, $alt) = $imagelist[ array_rand($imagelist) ];
-    $trigger = $firstimagetag . '<img alt="' . htmlspecialchars($alt) . '" src="' . makeUrlNS('Special', "DownloadFile/$image", "preview", true) . '" />' . '</a>';
+    $trigger = '<a><randomimage /></a>';
   }
+  
+  $trigger = str_replace('<a>', $firstimagetag, $trigger);
+  
+  list($image, $alt) = $imagelist[ array_rand($imagelist) ];
+  $randomimage = '<img alt="' . htmlspecialchars($alt) . '" src="' . makeUrlNS('Special', "DownloadFile/$image", "preview", true) . '" />';
+  $trigger = str_replace(array('<randomimage>', '<randomimage/>', '<randomimage />'), $randomimage, $trigger);
   
   return "$trigger<nowiki>
     <div style=\"display: none;\">$inner</div>
