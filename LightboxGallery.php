@@ -17,7 +17,7 @@ $plugins->attachHook('html_attribute_whitelist', '$whitelist["lightboxgallery"] 
 function lbgallery_process_tags(&$text)
 {
   // if there are no galleries in this blob, just get out here. also pulls all the matches we need.
-  if ( !preg_match_all('#<lightboxgallery(?: maxwidth="?([0-9]+)"?)>(.+?)</lightboxgallery>#s', $text, $matches) )
+  if ( !preg_match_all('#<lightboxgallery(?: maxwidth="?([0-9]+)"?)?>(.+?)</lightboxgallery>#s', $text, $matches) )
     return true;
   
   lbgallery_add_headers();
