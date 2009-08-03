@@ -34,9 +34,17 @@ function lbgallery_add_headers()
 {
   global $db, $session, $paths, $template, $plugins; // Common objects
   
-  $template->add_header('<script type="text/javascript" src="' . cdnPath . '/includes/clientside/static/jquery.js"></script>');
-  $template->add_header('<script type="text/javascript" src="' . cdnPath . '/includes/clientside/static/jquery-ui.js"></script>');
-  $template->add_header('<script type="text/javascript" src="' . scriptPath . '/plugins/lightboxgallery/jquery.lightbox-0.5.pack.js"></script>');
+  if ( method_exists($template, 'preload_js') && method_exists($template, 'add_header_js') )
+  {
+    $template->preload_js(array('jquery', 'jquery-ui'));
+    $template->add_header_js('<script type="text/javascript" src="' . scriptPath . '/plugins/lightboxgallery/jquery.lightbox-0.5.pack.js"></script>');
+  }
+  else
+  {
+    $template->add_header('<script type="text/javascript" src="' . cdnPath . '/includes/clientside/static/jquery.js"></script>');
+    $template->add_header('<script type="text/javascript" src="' . cdnPath . '/includes/clientside/static/jquery-ui.js"></script>');
+    $template->add_header('<script type="text/javascript" src="' . scriptPath . '/plugins/lightboxgallery/jquery.lightbox-0.5.pack.js"></script>');
+  }
   $template->add_header('<link rel="stylesheet" type="text/css" href="' . scriptPath . '/plugins/lightboxgallery/jquery.lightbox-0.5.css" />');
   $template->add_header('<script type="text/javascript">
       var loaded_components = loaded_components || {};
@@ -101,7 +109,7 @@ function lbgallery_build_gallery($gallerytag, $width)
       $alt = str_replace('_', ' ', dirtify_page_id($image));
     }
     $imagelist[] = array($image, $alt);
-    $tag = '<a class="' . $id . '" href="' . makeUrlNS('Special', "DownloadFile/$image", "preview&width=$width&height=9999", true) . '" title="' . trim(htmlspecialchars(RenderMan::render($alt))) . '">';
+    $tag = '<a class="' . $id . '" href="' . makeUrlNS('Special', "DownloadFile/$image", "preview&width=$width&height=9999&fmt=jpg", true) . '" title="' . trim(htmlspecialchars(RenderMan::render($alt))) . '">';
     if ( !isset($firstimageid) )
     {
       $firstimagetag = $tag;
@@ -132,10 +140,18 @@ function lbgallery_build_gallery($gallerytag, $width)
   return "$trigger<nowiki>
     <div style=\"display: none;\">$inner</div>
     <script type=\"text/javascript\">
-      addOnloadHook(function()
+      window.lbg_construct_$id = function()
         {
-          lbgallery_construct('a.$id');
-        });
+          if ( window.jQuery && window.jQuery.fn.lightBox )
+          {
+            lbgallery_construct('a.$id');
+          }
+          else
+          {
+            setTimeout(lbg_construct_$id, 200);
+          }
+        };
+      addOnloadHook(window.lbg_construct_$id);
     </script></nowiki>";
 }
 
