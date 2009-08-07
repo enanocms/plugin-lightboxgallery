@@ -62,7 +62,7 @@ function lbgallery_add_headers()
           imageBtnPrev:			\'' . scriptPath . '/plugins/lightboxgallery/images/lightbox-btn-prev.gif\',			// (string) Path and the name of the prev button image
           imageBtnNext:			\'' . scriptPath . '/plugins/lightboxgallery/images/lightbox-btn-next.gif\',			// (string) Path and the name of the next button image
           imageBtnClose:		\'' . scriptPath . '/plugins/lightboxgallery/images/lightbox-btn-close.gif\',		// (string) Path and the name of the close btn
-          imageBlank:				\'' . cdnPath . '/images/spacer.gif\',			// (string) Path and the name of a blank image (one pixel)
+          imageBlank:				\'' . cdnPath . '/images/spacer.gif\' 			// (string) Path and the name of a blank image (one pixel)
         };
         jQuery(selector).lightBox(settings);
       }
